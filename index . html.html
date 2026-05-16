@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Piano App</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color:#0a192f;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h2 {
+            color: #ffffff;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+        }
+
+        .piano-container {
+            display: flex;
+            background-color: #000000;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            position: relative;
+            width: 350px;
+            height: 200px;
+        }
+
+        .white-key {
+            flex: 1;
+            height: 200px;
+            background-color: #ffffff;
+            border: 1px solid #1a1a1a;
+            border-radius: 0 0 6px 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 15px;
+            font-weight: bold;
+            color: #555555;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .white-key:active {
+            background-color: #e0e0e0;
+        }
+
+        .black-key {
+            width: 24px;
+            height: 120px;
+            background-color: #222222;
+            border: 1px solid #000;
+            border-radius: 0 0 4px 4px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: absolute;
+            z-index: 2; 
+            box-shadow: inset 0 -4px 0 #333, 0 4px 6px rgba(0,0,0,0.6);
+        }
+
+        .black-key:active {
+            background-color: #444444;
+        }
+
+        /* Positions for black keys */
+        .c-sharp { left: 52px; }
+        .d-sharp { left: 102px; }
+        .f-sharp { left: 202px; }
+        .g-sharp { left: 252px; }
+        .a-sharp { left: 302px; }
+    </style>
+</head>
+<body>
+
+    <h2>PRO PIANO</h2>
+
+    <div class="piano-container">
+        <!-- White Keys -->
+        <div class="white-key" onclick="playNote('C')">C</div>
+        <div class="white-key" onclick="playNote('D')">D</div>
+        <div class="white-key" onclick="playNote('E')">E</div>
+        <div class="white-key" onclick="playNote('F')">F</div>
+        <div class="white-key" onclick="playNote('G')">G</div>
+        <div class="white-key" onclick="playNote('A')">A</div>
+        <div class="white-key" onclick="playNote('B')">B</div>
+
+        <!-- Black Keys -->
+        <div class="black-key c-sharp" onclick="playNote('CSharp')"></div>
+        <div class="black-key d-sharp" onclick="playNote('DSharp')"></div>
+        <div class="black-key f-sharp" onclick="playNote('FSharp')"></div>
+        <div class="black-key g-sharp" onclick="playNote('GSharp')"></div>
+        <div class="black-key a-sharp" onclick="playNote('ASharp')"></div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const noteFrequencies = {
+            'C': 261.63, 'CSharp': 277.18,
+            'D': 293.66, 'DSharp': 311.13,
+            'E': 329.63,
+            'F': 349.23, 'FSharp': 369.99,
+            'G': 392.00, 'GSharp': 415.30,
+            'A': 440.00, 'ASharp': 466.16,
+            'B': 493.88
+        };
+
+        function playNote(note) {
+            // Resume context if browser suspended it
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const frequency = noteFrequencies[note];
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'triangle'; 
+            oscillator.frequency.value = frequency;
+            
+            gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2); 
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 1.2);
+        }
+    </script>
+
+</body>
+</html>
